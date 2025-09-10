@@ -7,7 +7,7 @@ books = ["Game of Thrones" , "Murder in the Sought Expres"]
 coordinates = (1678, 98, -308)
 none = None
 othernumbers = {1, 2, 3, 4}
-itscool = True
+moon = True
 
 
 print(file)
