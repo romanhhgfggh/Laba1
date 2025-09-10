@@ -1,5 +1,5 @@
 number = 70
-metrs = 30
+metrs = 30.5
 file = b"What`s up bro?"
 place = 'Poliske'
 users = {"Roman": "Taras"}
