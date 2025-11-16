@@ -1,53 +1,54 @@
+import os
 import telebot
 from dotenv import load_dotenv
-import os
 
+# Завантажуємо змінні оточення (токен)
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
-if not TOKEN:
-    raise RuntimeError("TOKEN not found")
 
+if not TOKEN:
+    raise RuntimeError("Токен не знайдено! Переконайся, що файл .env існує.")
+
+# Створюємо об'єкт бота
 bot = telebot.TeleBot(TOKEN)
 
-@bot.message_handler(content_types=['text'])
-def echo_text(message):
-    bot.send_message(message.chat.id, message.text)
+# --- Єдина "Точка входу" для повідомлень ---
 
-@bot.message_handler(content_types=['photo'])
-def echo_photo(message):
-    # Відправляємо те саме фото
-    bot.send_photo(message.chat.id, message.photo[-1].file_id, caption=message.caption)
+# Список усіх типів контенту, які ми хочемо "віддзеркалювати"
+ALL_CONTENT_TYPES = [
+    'text', 'audio', 'document', 'photo', 'sticker', 'video',
+    'voice', 'location', 'contact', 'new_chat_members',
+    'left_chat_member', 'new_chat_title', 'new_chat_photo',
+    'delete_chat_photo', 'group_chat_created',
+    'supergroup_chat_created', 'channel_chat_created',
+    'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message'
+]
 
-@bot.message_handler(content_types=['video'])
-def echo_video(message):
-    # Відправляємо те саме відео
-    bot.send_video(message.chat.id, message.video.file_id, caption=message.caption)
+@bot.message_handler(content_types=ALL_CONTENT_TYPES)
+def echo_all_messages(message):
+    """
+    Цей ОДИН обробник перехоплює ВСІ типи повідомлень
+    і просто копіює їх назад користувачу.
+    """
+    try:
+        # Найпростіший спосіб "віддзеркалити" повідомлення - це скопіювати його
+        bot.copy_message(
+            chat_id=message.chat.id,
+            from_chat_id=message.chat.id,
+            message_id=message.message_id
+        )
+    except Exception as e:
+        print(f"Не вдалося скопіювати повідомлення: {e}")
 
-@bot.message_handler(content_types=['document'])
-def echo_document(message):
-    # Відправляємо той самий документ
-    bot.send_document(message.chat.id, message.document.file_id, caption=message.caption)
+# --- Головна "Точка входу" для скрипта ---
 
-@bot.message_handler(content_types=['audio'])
-def echo_audio(message):
-    # Відправляємо той самий аудіофайл
-    bot.send_audio(message.chat.id, message.audio.file_id, caption=message.caption)
-
-@bot.message_handler(content_types=['voice'])
-def echo_voice(message):
-    # Відправляємо ту саму голосову повідомлення
-    bot.send_voice(message.chat.id, message.voice.file_id)
-
-@bot.message_handler(content_types=['sticker'])
-def echo_sticker(message):
-    # Відправляємо той самий стікер
-    bot.send_sticker(message.chat.id, message.sticker.file_id)
-
-@bot.message_handler(content_types=['location'])
-def echo_location(message):
-    # Відправляємо ту саму локацію
-    bot.send_location(message.chat.id, message.location.latitude, message.location.longitude)
+def main():
+    """Головна функція для запуску бота."""
+    print("Бот запущений...")
+    # bot.polling() - це старий метод. 
+    # bot.infinity_polling() - більш надійний, він 
+    # автоматично перезапускається у разі збоїв.
+    bot.infinity_polling()
 
 if __name__ == '__main__':
-    print("Бот запущений...")
-    bot.polling()
+    main()
