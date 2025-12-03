@@ -32,7 +32,6 @@ def pair_counter_generator(filepath, target_pairs):
 # Пари для пошуку (як у вашому прикладі)
 targets = ['ан', 'ун', 'ну']
 
-print(f"Пошук пар: {targets}\n" + "-"*30)
 
 # Створюємо об'єкт генератора
 gen = pair_counter_generator("laba9_text.txt", targets)
